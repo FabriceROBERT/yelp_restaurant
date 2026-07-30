@@ -1,0 +1,25 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  - name: Gold Warehouse
+    uid: gold-postgres
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: datalake_admin
+    secureJsonData:
+      password: datalake_password_2026
+    jsonData:
+      database: gold_warehouse
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    editable: true

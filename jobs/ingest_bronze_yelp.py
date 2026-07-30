@@ -16,6 +16,7 @@ et sauvegardées dans bronze/_metrics/ pour le monitoring.
 import io
 import json
 import os
+import sys
 import tarfile
 import tempfile
 import time
@@ -25,7 +26,8 @@ from datetime import datetime, timezone
 import requests
 from botocore.exceptions import ClientError
 
-from s3_client import get_client
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "conf"))
+from s3_client import get_client  # noqa: E402
 
 BUCKET = "bronze"
 

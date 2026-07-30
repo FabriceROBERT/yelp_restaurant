@@ -1,7 +1,11 @@
 """Crée les buckets MinIO bronze/silver/gold s'ils n'existent pas."""
+import os
+import sys
+
 from botocore.exceptions import ClientError
 
-from s3_client import get_client
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "conf"))
+from s3_client import get_client  # noqa: E402
 
 BUCKETS = ["bronze", "silver", "gold"]
 

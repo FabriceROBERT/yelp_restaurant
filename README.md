@@ -79,7 +79,8 @@ Les ports par défaut sont modifiables dans `.env`.
 ## Statut
 
 - [x] Infrastructure Docker Compose (Spark, MinIO, PostgreSQL, monitoring)
-- [ ] Scripts d'ingestion Bronze (sources internes + externes)
+- [x] Ingestion Bronze - source externe Yelp Open Dataset (JSON + photos)
+- [ ] Source interne (Bronze)
 - [ ] Jobs Spark Silver (validation, déduplication, qualité)
 - [ ] Jobs Spark Gold (KPIs, agrégations)
 - [ ] Dashboards Grafana (ressources + opérations par couche)

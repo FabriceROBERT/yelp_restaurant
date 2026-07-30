@@ -1,0 +1,52 @@
+state_code,state_name,cost_of_living_index
+HI,Hawaii,185.0
+CA,California,142.3
+MA,Massachusetts,141.2
+DC,District of Columbia,138.8
+NY,New York,125.1
+AK,Alaska,124.9
+MD,Maryland,115.4
+NJ,New Jersey,115.1
+WA,Washington,114.1
+VT,Vermont,113.6
+ME,Maine,113.0
+CT,Connecticut,112.7
+OR,Oregon,111.8
+NH,New Hampshire,111.4
+AZ,Arizona,110.7
+RI,Rhode Island,110.6
+CO,Colorado,102.7
+FL,Florida,102.2
+UT,Utah,102.2
+DE,Delaware,101.9
+VA,Virginia,100.8
+NV,Nevada,100.2
+ID,Idaho,99.9
+NC,North Carolina,97.8
+WI,Wisconsin,97.7
+PA,Pennsylvania,97.2
+MT,Montana,95.5
+IL,Illinois,94.7
+SC,South Carolina,94.7
+MN,Minnesota,94.6
+OH,Ohio,94.3
+NM,New Mexico,93.7
+WY,Wyoming,93.7
+NE,Nebraska,92.6
+GA,Georgia,92.5
+KY,Kentucky,92.5
+LA,Louisiana,92.3
+TX,Texas,92.1
+SD,South Dakota,91.9
+ND,North Dakota,91.4
+IN,Indiana,91.0
+TN,Tennessee,90.3
+MI,Michigan,90.1
+IA,Iowa,89.7
+AR,Arkansas,89.6
+MO,Missouri,89.0
+KS,Kansas,88.8
+AL,Alabama,88.6
+WV,West Virginia,88.3
+MS,Mississippi,87.3
+OK,Oklahoma,86.0

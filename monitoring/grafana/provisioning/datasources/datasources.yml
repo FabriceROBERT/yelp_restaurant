@@ -14,11 +14,11 @@ datasources:
     type: postgres
     access: proxy
     url: postgres:5432
-    user: datalake_admin
+    user: $__env{POSTGRES_USER}
     secureJsonData:
-      password: datalake_password_2026
+      password: $__env{POSTGRES_PASSWORD}
     jsonData:
-      database: gold_warehouse
+      database: $__env{POSTGRES_DB}
       sslmode: disable
       postgresVersion: 1600
       timescaledb: false

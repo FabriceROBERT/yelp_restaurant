@@ -214,6 +214,23 @@ def transform_internal(spark: SparkSession) -> tuple[DataFrame, dict]:
     return clean(df, "internal_cost_of_living", required_cols=["state_code", "cost_of_living_index"], key_cols=["state_code"])
 
 
+# ---------------------------------------------------------------- weather
+def transform_weather(spark: SparkSession) -> tuple[DataFrame, dict]:
+    df = spark.read.option("header", True).csv(f"{BRONZE}/weather/daily_weather_by_city.csv")
+    df = (
+        df.withColumn("date", F.to_date(F.col("date")))
+        .withColumn("temp_max_c", F.col("temp_max_c").cast(DoubleType()))
+        .withColumn("temp_min_c", F.col("temp_min_c").cast(DoubleType()))
+        .withColumn("precipitation_mm", F.col("precipitation_mm").cast(DoubleType()))
+    )
+    return clean(
+        df,
+        "weather",
+        required_cols=["city", "state", "date"],
+        key_cols=["city", "state", "date"],
+    )
+
+
 ENTITIES = {
     "business": (transform_business, "state"),
     "review": (transform_review, "year"),
@@ -221,6 +238,7 @@ ENTITIES = {
     "tip": (transform_tip, "year"),
     "checkin": (transform_checkin, "year"),
     "internal": (transform_internal, None),
+    "weather": (transform_weather, "state"),
 }
 
 

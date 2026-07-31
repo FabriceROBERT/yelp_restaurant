@@ -6,6 +6,7 @@ Scope : A1-A4 du dashboard gérant/analyste (cf. README_fonctionnalites.md).
 - A2 kpi_meteo_frequentation  : check-ins moyens/jour, pluie vs beau temps (villes météo uniquement)
 - A3 kpi_cout_vie_prix        : positionnement prix/note vs coût de la vie, par état
 - A4 score_valeur_percue      : note ajustée par le prix normalisé au coût de vie local
+- dim_business_photos         : photos (non-structuré) liées à leur établissement
 
 Écrit dans les tables gold.* définies par postgres/init/01-init.sql (le
 script ne fait que TRUNCATE + INSERT dans des tables déjà créées - il ne
@@ -121,6 +122,62 @@ def build_score_valeur_percue(business):
     )
 
 
+def build_summary(business):
+    """Une seule ligne de synthèse (page d'accueil) - comptages non exposés
+    aux doublons de l'explosion par catégorie dans kpi_business."""
+    return business.agg(
+        F.countDistinct("business_id").alias("nb_etablissements"),
+        F.sum("review_count").alias("nb_avis"),
+        F.round(F.avg("stars"), 2).alias("note_moyenne"),
+        F.countDistinct("city").alias("nb_villes"),
+    )
+
+
+def build_dim_business(business):
+    """Une ligne par établissement, infos brutes (pas d'agrégation) - couvre
+    TOUS les établissements, contrairement à kpi_business (agrégé) et
+    score_valeur_percue (filtré aux prix + coût de vie connus)."""
+    return business.select(
+        "business_id",
+        F.col("name").alias("nom"),
+        F.col("address").alias("adresse"),
+        F.col("city").alias("ville"),
+        F.col("state").alias("state_code"),
+        F.col("postal_code").alias("code_postal"),
+        F.col("attributes.RestaurantsPriceRange2").alias("gamme_prix"),
+        F.round(F.col("stars"), 2).alias("note_moyenne"),
+        F.col("review_count").alias("nb_avis"),
+        F.col("is_open").alias("ouvert"),
+    )
+
+
+def build_dim_review(spark):
+    """Avis détaillés (texte, note, votes) - table complète (6.99M lignes),
+    indexée par business_id côté Postgres pour une consultation rapide par
+    établissement (ex: clic sur le nombre d'avis dans la galerie)."""
+    review = spark.read.parquet(f"{SILVER}/review")
+    return review.select(
+        "review_id",
+        "business_id",
+        "user_id",
+        F.col("stars").alias("note"),
+        F.col("text").alias("texte"),
+        F.to_date("date").alias("date_avis"),
+        F.col("useful").alias("utile"),
+        F.col("funny").alias("drole"),
+        F.col("cool").alias("sympa"),
+    )
+
+
+def build_dim_business_photos(spark):
+    """Photos (non-structuré) liées à leur établissement, via photo_id ->
+    business_id (photos.json). Limité à l'échantillon Silver (5000 photos)."""
+    photos = spark.read.parquet(f"{SILVER}/photos_index")
+    return photos.filter(F.col("business_id").isNotNull()).select(
+        "photo_id", "business_id", "caption", "label"
+    )
+
+
 def build_kpi_meteo_frequentation(spark, business):
     """Nb moyen de check-ins/jour par ville, jour de pluie vs beau temps.
     Limité aux villes couvertes par l'ingestion météo (échantillon, cf.
@@ -164,10 +221,14 @@ def main() -> None:
     dim_cost_of_living = spark.read.parquet(f"{SILVER}/internal_cost_of_living")
     write_gold(dim_cost_of_living, "gold.dim_cost_of_living")
 
+    write_gold(build_summary(business), "gold.dim_summary")
+    write_gold(build_dim_business(business), "gold.dim_business")
     write_gold(build_kpi_business(business), "gold.kpi_business")
     write_gold(build_kpi_cout_vie_prix(business), "gold.kpi_cout_vie_prix")
     write_gold(build_score_valeur_percue(business), "gold.score_valeur_percue")
     write_gold(build_kpi_meteo_frequentation(spark, business), "gold.kpi_meteo_frequentation")
+    write_gold(build_dim_business_photos(spark), "gold.dim_business_photos")
+    write_gold(build_dim_review(spark), "gold.dim_review")  # la plus grosse (6.99M lignes), en dernier
 
     business.unpersist()
     log(f"=== GOLD : TERMINE === {time.time() - t0:.1f}s")

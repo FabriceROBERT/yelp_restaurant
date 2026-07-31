@@ -231,6 +231,19 @@ def transform_weather(spark: SparkSession) -> tuple[DataFrame, dict]:
     )
 
 
+# ---------------------------------------------------------- photos_metadata
+def transform_photos_metadata(spark: SparkSession) -> tuple[DataFrame, dict]:
+    """photo_id -> business_id -> caption -> label, extrait de l'archive
+    photos (photos.json), pour relier les photos aux établissements."""
+    df = spark.read.json(f"{BRONZE}/yelp/photos_metadata.json")
+    return clean(
+        df,
+        "photos_metadata",
+        required_cols=["photo_id", "business_id"],
+        key_cols=["photo_id"],
+    )
+
+
 ENTITIES = {
     "business": (transform_business, "state"),
     "review": (transform_review, "year"),
@@ -239,6 +252,7 @@ ENTITIES = {
     "checkin": (transform_checkin, "year"),
     "internal": (transform_internal, None),
     "weather": (transform_weather, "state"),
+    "photos_metadata": (transform_photos_metadata, None),
 }
 
 

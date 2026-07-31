@@ -107,7 +107,19 @@ def main() -> None:
 
     total_out = approx_deduped.count()
 
-    index = approx_deduped.select("filename", "width", "height", "sha256", "phash")
+    # Le nom de fichier EST le photo_id (ex: mj3HHurG_-Lzui2DohAQFQ.jpg) - on
+    # peut donc relier chaque photo à son établissement sans re-décoder les
+    # images, juste en joignant sur ce photo_id.
+    with_photo_id = approx_deduped.withColumn(
+        "photo_id", F.regexp_replace(F.col("filename"), r"\.[a-zA-Z]+$", "")
+    )
+    metadata = spark.read.parquet(f"{SILVER}/photos_metadata").select(
+        "photo_id", "business_id", "caption", "label"
+    )
+    index = with_photo_id.join(metadata, "photo_id", "left").select(
+        "photo_id", "filename", "width", "height", "sha256", "phash", "business_id", "caption", "label"
+    )
+    linked_count = index.filter(F.col("business_id").isNotNull()).count()
     index.write.mode("overwrite").parquet(f"{SILVER}/photos_index")
     valid.unpersist()
 
@@ -118,6 +130,7 @@ def main() -> None:
         "exact_duplicates_found": exact_dup_count,
         "approx_duplicates_found": approx_dup_count,
         "total_output_records": total_out,
+        "linked_to_business": linked_count,
         "duration_seconds": round(time.time() - t0, 2),
     }
     log(f"=== SILVER photos : TERMINE === {metrics}")

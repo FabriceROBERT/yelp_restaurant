@@ -21,6 +21,42 @@ CREATE TABLE IF NOT EXISTS gold.dim_cost_of_living (
 );
 
 -- ------------------------------------------------------------
+-- Dimension : un établissement = une ligne (toutes infos, pas d'agrégation)
+-- Contrairement à kpi_business (agrégé par catégorie) et score_valeur_percue
+-- (filtré aux établissements avec prix + coût de vie connus), celle-ci
+-- couvre TOUS les établissements avec leurs infos brutes (adresse incluse).
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_business (
+    business_id     VARCHAR(50) PRIMARY KEY,
+    nom              VARCHAR(255),
+    adresse          VARCHAR(255),
+    ville            VARCHAR(100),
+    state_code       CHAR(2),
+    code_postal      VARCHAR(20),
+    gamme_prix       VARCHAR(10),
+    note_moyenne     NUMERIC(3,2),
+    nb_avis          INTEGER,
+    ouvert           BOOLEAN
+);
+
+-- ------------------------------------------------------------
+-- Avis détaillés (texte, note, votes) - liste consultable par établissement
+-- (ex: clic sur le nombre d'avis dans la galerie photos).
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_review (
+    review_id       VARCHAR(50) PRIMARY KEY,
+    business_id     VARCHAR(50),
+    user_id         VARCHAR(50),
+    note            NUMERIC(2,1),
+    texte           TEXT,
+    date_avis       DATE,
+    utile           INTEGER,
+    drole            INTEGER,
+    sympa           INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_review_business ON gold.dim_review(business_id);
+
+-- ------------------------------------------------------------
 -- A1 : note moyenne et volume d'avis par catégorie / ville / prix
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS gold.kpi_business (
@@ -82,9 +118,35 @@ CREATE TABLE IF NOT EXISTS gold.score_valeur_percue (
 );
 
 -- ------------------------------------------------------------
+-- Résumé global (une seule ligne) : indicateurs de la page d'accueil
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_summary (
+    nb_etablissements   INTEGER,
+    nb_avis             INTEGER,
+    note_moyenne        NUMERIC(3,2),
+    nb_villes           INTEGER,
+    date_calcul         TIMESTAMP DEFAULT NOW()
+);
+
+-- ------------------------------------------------------------
+-- Photos (non-structuré) liées aux établissements
+-- Échantillon (5000 photos extraites, cf. jobs/prepare_silver_photos_sample.py),
+-- lien photo_id -> business_id via photos.json (métadonnées Yelp).
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_business_photos (
+    id              SERIAL PRIMARY KEY,
+    photo_id        VARCHAR(50),
+    business_id     VARCHAR(50),
+    caption         TEXT,
+    label           VARCHAR(50),
+    date_calcul     TIMESTAMP DEFAULT NOW()
+);
+
+-- ------------------------------------------------------------
 -- Index
 -- ------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_kpi_business_ville ON gold.kpi_business(ville);
 CREATE INDEX IF NOT EXISTS idx_kpi_business_categorie ON gold.kpi_business(categorie);
 CREATE INDEX IF NOT EXISTS idx_cout_vie_state ON gold.kpi_cout_vie_prix(state_code);
 CREATE INDEX IF NOT EXISTS idx_score_valeur_business ON gold.score_valeur_percue(business_id);
+CREATE INDEX IF NOT EXISTS idx_business_photos_business ON gold.dim_business_photos(business_id);

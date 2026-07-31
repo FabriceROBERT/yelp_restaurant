@@ -43,7 +43,7 @@ export default async function Home() {
             nb_villes::int AS nb_villes
      FROM gold.dim_summary
      ORDER BY date_calcul DESC
-     LIMIT 1`
+     LIMIT 1`,
   );
 
   const indicators = [
@@ -82,18 +82,12 @@ export default async function Home() {
               Dashboard analytique
             </h1>
           </div>
-
-          <div className="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-            PostgreSQL Gold
-          </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-8">
         <section>
-          <h2 className="text-lg font-bold text-slate-900">
-            Vue d’ensemble
-          </h2>
+          <h2 className="text-lg font-bold text-slate-900">Vue d’ensemble</h2>
 
           <p className="mt-1 text-sm text-slate-600">
             Indicateurs principaux issus de la couche Gold du projet Yelp.
@@ -103,8 +97,7 @@ export default async function Home() {
             {indicators.map((indicator) => (
               <article
                 key={indicator.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p className="text-sm font-medium text-slate-500">
                   {indicator.title}
                 </p>
@@ -135,8 +128,7 @@ export default async function Home() {
             {dashboardSections.map((section) => (
               <article
                 key={section.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start gap-4">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">
@@ -149,8 +141,7 @@ export default async function Home() {
 
                     <Link
                       href={section.href}
-                      className="mt-5 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
-                    >
+                      className="mt-5 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700">
                       Consulter l’analyse
                     </Link>
                   </div>
@@ -177,8 +168,7 @@ export default async function Home() {
 
           <Link
             href="/recommandations"
-            className="mt-6 inline-block rounded-lg bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-500"
-          >
+            className="mt-6 inline-block rounded-lg bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-500">
             Ouvrir les recommandations
           </Link>
         </section>

@@ -28,6 +28,13 @@ Sources externes (API, scraping, téléchargements)
 - **Data warehouse** : PostgreSQL pour les KPIs de la couche Gold.
 - **Monitoring** : Prometheus (métriques) + Grafana (dashboards) + Node Exporter (ressources hôte) + Postgres Exporter (opérations DB).
 
+## Sources de données (Bronze)
+
+| Source | Type | Origine |
+|---|---|---|
+| Yelp Open Dataset (JSON + photos) | Externe | Téléchargée automatiquement depuis [business.yelp.com](https://business.yelp.com/data/resources/open-dataset/) à chaque exécution du script d'ingestion. |
+| Indice coût de la vie par État (`data/internal/cost_of_living_by_state.csv`) | Interne | Fichier statique committé dans le repo (pas de fetch réseau au pipeline). Valeurs issues de [World Population Review](https://worldpopulationreview.com/state-rankings/cost-of-living-index-by-state) (agrégat MERIC + BEA Regional Price Parities). Détails et méthodologie dans [`data/internal/cost_of_living_by_state.SOURCE.md`](data/internal/cost_of_living_by_state.SOURCE.md). |
+
 ## Prérequis
 
 - Docker + Docker Compose v2
@@ -80,7 +87,7 @@ Les ports par défaut sont modifiables dans `.env`.
 
 - [x] Infrastructure Docker Compose (Spark, MinIO, PostgreSQL, monitoring)
 - [x] Ingestion Bronze - source externe Yelp Open Dataset (JSON + photos)
-- [ ] Source interne (Bronze)
+- [x] Ingestion Bronze - source interne (indice coût de la vie par État)
 - [ ] Jobs Spark Silver (validation, déduplication, qualité)
 - [ ] Jobs Spark Gold (KPIs, agrégations)
 - [ ] Dashboards Grafana (ressources + opérations par couche)

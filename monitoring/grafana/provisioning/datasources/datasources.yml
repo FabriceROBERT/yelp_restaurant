@@ -5,11 +5,19 @@ datasources:
     type: postgres
     access: proxy
     url: postgres:5432
+<<<<<<< HEAD
     user: ${POSTGRES_USER}
     isDefault: false
     secureJsonData:
       password: ${POSTGRES_PASSWORD}
     jsonData:
       database: ${POSTGRES_DB}
+=======
+    user: $__env{POSTGRES_USER}
+    secureJsonData:
+      password: $__env{POSTGRES_PASSWORD}
+    jsonData:
+      database: $__env{POSTGRES_DB}
+>>>>>>> main
       sslmode: disable
       postgresVersion: 1600

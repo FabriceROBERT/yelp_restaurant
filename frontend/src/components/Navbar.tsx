@@ -5,6 +5,7 @@ const navigation = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Météo", href: "/meteo" },
   { label: "Coût de la vie", href: "/cout-de-la-vie" },
+  { label: "Galerie", href: "/galerie" },
   { label: "Recommandations", href: "/recommandations" },
   { label: "Pépites", href: "/pepites" },
 ];
